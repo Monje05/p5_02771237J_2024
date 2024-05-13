@@ -90,12 +90,22 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 */
 	public BinarySearchTreeImpl() {
 		// TODO HACER QUE THIS SEA EL NODO VACIO
+		this.right = null;
+		this.left = null;
+		this.content = null;
+		this.count = 0;
+		this.father = null;
 	
 	}
 
 	public BinarySearchTreeImpl(BinarySearchTreeImpl<T> father) {
 		// TODO HACER QUE THIS SEA EL NODO VACIO, asignando como padre el parametro
 		// recibido
+		this.right = null;
+		this.left = null;
+		this.content = null;
+		this.count = 0;
+		this.father = father;
 	
 	}
 
@@ -131,11 +141,16 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * @param elements elementos a insertar.
 	 * @return  	numero de elementos insertados en el arbol (elementos diferentes de null)
 	 */
+	@SuppressWarnings("unchecked")
 	public int insert(T... elements) {
-		
-		// si alguno es 'null', no inserta ese elemento
-		// TODO Implementar el metodo
-		return 0;
+		int insertados = 0;
+		for(T element : elements) {
+			if(element != null) {
+				insert(element);
+				insertados++;
+			}
+		}
+		return insertados;
 	}
 
 	/**
@@ -154,8 +169,29 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * @throws IllegalArgumentException si element es null
 	 */
 	public boolean insert(T element) {
-		// TODO Implementar el metodo
-	 return false;
+		if(element == null) {
+			throw new IllegalArgumentException();
+		}
+		if(content == null) {
+			this.content = element;
+			this.count = 1;
+			return true;
+		}
+		int comparison = element.compareTo(this.content);
+		if(comparison == 0) {
+			this.count++;
+			return false;
+		} else if(comparison < 0) {
+			if(this.left == null) {
+				this.left = new BinarySearchTreeImpl<>(this);
+			}
+			return this.getLeftBST().insert(element);
+		} else {
+			if(this.right == null) {
+				this.right = new BinarySearchTreeImpl<>(this);
+			}
+			return this.getRightBST().insert(element);
+		}
 	}
 
 	/**
