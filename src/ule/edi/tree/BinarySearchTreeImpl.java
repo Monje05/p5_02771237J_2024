@@ -126,10 +126,14 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * @return numero de elementos insertados en el arbol (elementos diferentes de null)
 	 */
 	public int insert(Collection<T> elements) {
-		// si alguno es 'null', no se inserta
-		// TODO Implementar el metodo
-		
-		return 0;
+		int insertados = 0;
+		for(T element : elements) {
+			if(element != null) {
+				insert(element);
+				insertados++;
+			}
+		}
+		return insertados;
 	}
 
 	/**
@@ -205,8 +209,22 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 *
 	 */
 	public boolean contains(T element) {
-		// TODO Implementar el metodo
-		return false;
+		if(element == null) {
+			throw new IllegalArgumentException();
+		}
+		if(this.content == null) {
+			return false;
+		}
+		int comparision = element.compareTo(this.content);
+		if(comparision == 0) {
+			return true;
+		} else if(comparision < 0 && this.left != null) {
+			return this.getLeftBST().contains(element);
+		} else if(comparision > 0 && this.right != null) {
+			return this.getRightBST().contains(element);
+		} else {
+			return false;
+		}
 	}
 	
 	/**
@@ -226,15 +244,33 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 		// añadiendo el código necesario para poner detrás del content entre paréntesis el count
 		// solo si éste es mayor que 1.
 		// Código que añade el content: result.append("{" + content.toString());
-		
-		return null;
-		
+		if(!isEmpty()) {
+			StringBuilder result = new StringBuilder();
+			result.append("{" + content.toString());
+			if(!tags.isEmpty()) {
+				result.append(" [");
+				List<String> keys = new LinkedList<String>(tags.keySet());
+				keys.sort(null);
+				for(String key : keys) {
+					result.append("(").append(key).append(", ").append(tags.get(key)).append("), ");
+				}
+				result.delete(result.length() - 2, result.length());
+				result.append("]");
+			}
+			if(this.left != null) {
+				result.append(", ").append(this.left.toString());
+			}
+			if(this.right != null) {
+				result.append(", ").append(this.right.toString());
+			}
+			result.append("}");
+			return result.toString();
+		} else {
+			return AbstractTreeADT.EMPTY_TREE_MARK;
+		}
 	}
 
 
-
-	
-	
 	/**
 	 * Devuelve un iterador que recorre los elementos (sin tener en cuenta el número de instancias)del arbol por niveles segun
 	 * el recorrido en anchura
@@ -289,8 +325,17 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * @return el numero de elementos diferentes del arbol 
 	 */
     public int size() {
-		// TODO implementar este metodo
-		return 0;
+		return sizeRecursive(this);
+	}
+
+	private int sizeRecursive(BinarySearchTreeImpl<T> tree) {
+		if(tree == null || tree.isEmpty()) {
+			return 0;
+		}
+		int count = 1;
+		int leftCount = sizeRecursive(tree.getLeftBST());
+		int rightCount = sizeRecursive(tree.getRightBST());
+		return count + leftCount + rightCount;
 	}
 	
     /**
@@ -305,8 +350,17 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * @return el número de instancias de elementos del arbol 
 	 */
 	public int instancesCount() {
-		// TODO implementar este metodo
-		return 0;
+		return instancesCountRecursive(this);
+	}
+
+	private int instancesCountRecursive(BinarySearchTreeImpl<T> tree) {
+		if(tree == null || tree.isEmpty()) {
+			return 0;
+		}
+		int count = tree.count;
+		int leftCount = instancesCountRecursive(tree.getLeftBST());
+		int rightCount = instancesCountRecursive(tree.getRightBST());
+		return count + leftCount + rightCount;
 	}
 	
 

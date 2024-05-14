@@ -67,6 +67,11 @@ public class BinarySearchTreeTests {
 	    	}
 	
 	@Test
+	public void instancesCount_test() {
+		Assert.assertEquals("4", ejemplo.instancesCount());
+	}
+	
+	@Test
 	public void testRemoveCountMayor1() {
 		ejemplo.insert(20);
 		ejemplo.insert(20);
