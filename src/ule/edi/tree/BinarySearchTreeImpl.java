@@ -2,8 +2,9 @@ package ule.edi.tree;
 
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
-
+import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -244,30 +245,35 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 		// añadiendo el código necesario para poner detrás del content entre paréntesis el count
 		// solo si éste es mayor que 1.
 		// Código que añade el content: result.append("{" + content.toString());
-		if(!isEmpty()) {
-			StringBuilder result = new StringBuilder();
+		if (! isEmpty()) {
+			//	Construye el resultado de forma eficiente
+			StringBuffer result = new StringBuffer();
+			//	Raíz
 			result.append("{" + content.toString());
-			if(!tags.isEmpty()) {
+			if(this.count > 1) {
+				result.append("{" + content.toString());
+			}
+			if (! tags.isEmpty()) {
 				result.append(" [");
-				List<String> keys = new LinkedList<String>(tags.keySet());
-				keys.sort(null);
-				for(String key : keys) {
-					result.append("(").append(key).append(", ").append(tags.get(key)).append("), ");
+				List<String> sk = new LinkedList<String>(tags.keySet());
+				Collections.sort(sk);
+				for (String k : sk) {
+					result.append("(" + k + ", " + tags.get(k) + "), ");
 				}
 				result.delete(result.length() - 2, result.length());
 				result.append("]");
 			}
-			if(this.left != null) {
-				result.append(", ").append(this.left.toString());
+			//	Y cada sub-árbol
+			for (int i = 0; i < getMaxDegree(); i++) {
+				result.append(", " + getSubtree(i).toString());
 			}
-			if(this.right != null) {
-				result.append(", ").append(this.right.toString());
-			}
+			//	Cierra la "}" de este árbol
 			result.append("}");
 			return result.toString();
 		} else {
 			return AbstractTreeADT.EMPTY_TREE_MARK;
 		}
+	}
 	}
 
 
