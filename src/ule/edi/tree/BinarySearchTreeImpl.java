@@ -240,11 +240,6 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * @return cadena con el contenido del árbol incluyendo su atributo count entre paréntesis si elemento tiene más de 1 instancia
 	 */
 	public String toString() {
-		// TODO implementar este metodo
-		// CONSEJO: Hay que reciclar la implementación del método de la clase AbstractTreeADT, 
-		// añadiendo el código necesario para poner detrás del content entre paréntesis el count
-		// solo si éste es mayor que 1.
-		// Código que añade el content: result.append("{" + content.toString());
 		if (! isEmpty()) {
 			//	Construye el resultado de forma eficiente
 			StringBuffer result = new StringBuffer();
@@ -265,7 +260,11 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 			}
 			//	Y cada sub-árbol
 			for (int i = 0; i < getMaxDegree(); i++) {
-				result.append(", " + getSubtree(i).toString());
+				if (getSubtree(i) != null) {
+					result.append(", " + getSubtree(i).toString());
+				} else {
+					result.append(", ∅");
+				}
 			}
 			//	Cierra la "}" de este árbol
 			result.append("}");
@@ -273,7 +272,6 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 		} else {
 			return AbstractTreeADT.EMPTY_TREE_MARK;
 		}
-	}
 	}
 
 

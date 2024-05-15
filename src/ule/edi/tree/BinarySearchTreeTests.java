@@ -68,7 +68,7 @@ public class BinarySearchTreeTests {
 	
 	@Test
 	public void instancesCount_test() {
-		Assert.assertEquals("4", ejemplo.instancesCount());
+		Assert.assertEquals(6, ejemplo.instancesCount());
 	}
 	
 	@Test
