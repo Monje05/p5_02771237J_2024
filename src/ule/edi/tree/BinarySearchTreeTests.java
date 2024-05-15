@@ -1,6 +1,10 @@
 package ule.edi.tree;
 
 
+import static org.junit.Assert.assertEquals;
+
+import java.text.CollationElementIterator;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,11 +68,55 @@ public class BinarySearchTreeTests {
 		other.insert(10, 20, 5, 2, 15, 12);
 		Assert.assertEquals(other.toString(), "{10, {5, {2, ∅, ∅}, ∅}, {20, {15, {12, ∅, ∅}, ∅}, ∅}}");
 		
-	    	}
+	}
+
+	@Test 
+	public void insert_Collections_test() {
+		Collection<Integer> elementos = new LinkedList<>();
+		elementos.add(3);
+		elementos.add(7);
+		elementos.add(null);
+		elementos.add(17);
+		int insertadors = ejemplo.insert(elementos);
+		Assert.assertEquals(3, insertadors);
+		Assert.assertEquals("{10, {5, {2, ∅, {3, ∅, ∅}}, {7, ∅, ∅}}, {20, {15, ∅, {17, ∅, ∅}}, {30, ∅, ∅}}}", ejemplo.toString());
+	}
+
+	@Test
+	public void insert_T_test() {
+		Assert.assertEquals(4, ejemplo.insert(1, 6, null, 4, 13));
+		Assert.assertEquals("{10, {5, {2, {1, ∅, ∅}, {4, ∅, ∅}}, {6, ∅, ∅}}, {20, {15, {13, ∅, ∅}, ∅}, {30, ∅, ∅}}}", ejemplo.toString());
+	}
+
+	@Test
+	public void insert_test() {
+		Assert.assertTrue(ejemplo.insert(7));
+		Assert.assertFalse(ejemplo.insert(20));
+	}
 	
+	@Test
+	public void contains_test() {
+		Assert.assertTrue(ejemplo.insert(7));
+		Assert.assertFalse(ejemplo.insert(20));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void contains_Exception_test() {
+		ejemplo.contains(null);
+	}
+
+	@Test
+	public void size_test() {
+		Assert.assertEquals(6, ejemplo.size());
+		ejemplo.insert(2, 10, 30);
+		Assert.assertEquals(6, ejemplo.size());
+	}
+
 	@Test
 	public void instancesCount_test() {
 		Assert.assertEquals(6, ejemplo.instancesCount());
+		ejemplo.insert(2, 10, 30);
+		Assert.assertEquals(9, ejemplo.instancesCount());
 	}
 	
 	@Test
