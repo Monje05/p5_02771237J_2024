@@ -377,8 +377,14 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * return numero de elementos eliminados del arbol
 	 */
 	public int  remove(T... elements) {
-		// TODO Implementar el metodo
-		return 0;
+		int removed = 0;
+		for(T element : elements) {
+			if(element != null && contains(element)) {
+				remove(element);
+				removed++;
+			}
+		}
+		return removed;
 	}
 
 	/**
@@ -392,9 +398,53 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
      *
 	 */
 	public void remove(T element) {
-		
-		// TODO Implementar el metodo
-		
+		if(!contains(element)) {
+			throw new NoSuchElementException();
+		}
+		if(element == null) {
+			throw new IllegalArgumentException();
+		}
+		if(count > 1) {
+			count--;
+		} else  {
+			if(left != null && right != null) {
+				BinarySearchTreeImpl<T> sucesor = getRightBST().minValueNode();
+				content = sucesor.content;
+				count = sucesor.count;
+				getRightBST().remove(sucesor.content);
+			} else {
+				BinarySearchTreeImpl<T> child;
+				if(left != null) {
+					child = getLeftBST();
+				} else {
+					child = getRightBST();
+				}
+				if(father == null) {
+					this.content = child.content;
+					this.left = child.left;
+					this.right = child.right;
+					this.count = child.count;
+					this.father = child.father;
+				} else {
+					if(this == father.left) {
+						father.left = child;
+					} else {
+						father.right = child;
+					}
+					if(child != null) {
+						child.father = father;
+					}
+				}
+			}
+		}
+	}
+
+	private BinarySearchTreeImpl<T> minValueNode() {
+		BinarySearchTreeImpl<T> current = this;
+		while(current.left != null) {
+			current = current.getLeftBST();
+		}
+		return current;
 	}
 	
 	/**
