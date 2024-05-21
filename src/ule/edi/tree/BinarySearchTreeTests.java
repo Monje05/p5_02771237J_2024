@@ -118,14 +118,20 @@ public class BinarySearchTreeTests {
 		ejemplo.insert(2, 10, 30);
 		Assert.assertEquals(9, ejemplo.instancesCount());
 	}
+
+	@Test
+	public void remove_T_test() {
+		Assert.assertEquals(2, ejemplo.remove(5,6));
+		Assert.assertEquals("{10, {5, {2, {1, ∅, ∅}, {4, ∅, ∅}}, {6, ∅, ∅}}, {20, {15, {13, ∅, ∅}, ∅}, {30, ∅, ∅}}}", ejemplo.toString());
+	}
 	
 	@Test
 	public void testRemoveCountMayor1() {
 		ejemplo.insert(20);
 		ejemplo.insert(20);
-		Assert.assertEquals(ejemplo.toString(), "{10, {5, {2, ∅, ∅}, ∅}, {20(3), {15, ∅, ∅}, {30, ∅, ∅}}}");
+		Assert.assertEquals("{10, {5, {2, ∅, ∅}, ∅}, {20(3), {15, ∅, ∅}, {30, ∅, ∅}}}", ejemplo.toString());
 		ejemplo.remove(20);
-	    Assert.assertEquals(ejemplo.toString(), "{10, {5, {2, ∅, ∅}, ∅}, {20(2), {15, ∅, ∅}, {30, ∅, ∅}}}");
+	    Assert.assertEquals("{10, {5, {2, ∅, ∅}, ∅}, {20(2), {15, ∅, ∅}, {30, ∅, ∅}}}", ejemplo.toString());
 	}
 	
 	@Test
