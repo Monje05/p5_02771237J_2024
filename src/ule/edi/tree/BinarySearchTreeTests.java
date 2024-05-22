@@ -121,8 +121,8 @@ public class BinarySearchTreeTests {
 
 	@Test
 	public void remove_T_test() {
-		Assert.assertEquals(2, ejemplo.remove(5,6));
-		Assert.assertEquals("{10, {5, {2, {1, ∅, ∅}, {4, ∅, ∅}}, {6, ∅, ∅}}, {20, {15, {13, ∅, ∅}, ∅}, {30, ∅, ∅}}}", ejemplo.toString());
+		ejemplo.remove(15);
+		Assert.assertEquals("{10, {5, {2, ∅, ∅}, ∅}, {20, ∅, {30, ∅, ∅}}}", ejemplo.toString());
 	}
 	
 	@Test
@@ -155,8 +155,8 @@ public class BinarySearchTreeTests {
 	
 	@Test
 	public void testRemove1Hijo() {
-		ejemplo.remove(5);
-		Assert.assertEquals("{10, {2, ∅, ∅}, {20, {15, ∅, ∅}, {30, ∅, ∅}}}",ejemplo.toString());
+		ejemplo.remove(2);
+		Assert.assertEquals("{10, {5, ∅, ∅}, {20, {15, ∅, ∅}, {30, ∅, ∅}}}",ejemplo.toString());
 	}
 	
 	@Test
@@ -165,30 +165,75 @@ public class BinarySearchTreeTests {
 		Assert.assertEquals("{15, {5, {2, ∅, ∅}, ∅}, {20, ∅, {30, ∅, ∅}}}",ejemplo.toString());
 	}
 	
-			
+	@Test
+	public void removeAll_test() {
+		ejemplo.insert(20);
+		ejemplo.insert(20);
+		ejemplo.removeAll(20);
+		Assert.assertEquals("{10, {5, {2, ∅, ∅}, ∅}, {30, {15, ∅, ∅}, ∅}}",ejemplo.toString());
+	}	
 				
-		@Test(expected = IllegalArgumentException.class)
-		public void testInsertException() {
-			Integer i = null;
-			other.insert(i);	
-		}
+	@Test(expected = IllegalArgumentException.class)
+	public void testInsertException() {
+		Integer i = null;
+		other.insert(i);	
+	}
 		
 	
-		@Test(expected = IllegalArgumentException.class)
-		public void testContainsNull() {
-			other.contains(null);
-		}
-		
-		@Test(expected = IllegalArgumentException.class)
-		public void testRemoveNullElement() {
-			Integer i = null;
-			other.remove(i);
-		}
-		
-		@Test(expected = NoSuchElementException.class)
-		public void testRemoveNoSuchElement() {
-			other.remove(11);
-		}
+	@Test(expected = IllegalArgumentException.class)
+	public void testContainsNull() {
+		other.contains(null);
 	}
+		
+	@Test(expected = IllegalArgumentException.class)
+	public void testRemoveNullElement() {
+		Integer i = null;
+		other.remove(i);
+	}
+		
+	@Test(expected = NoSuchElementException.class)
+	public void testRemoveNoSuchElement() {
+		other.remove(11);
+	}
+
+	@Test
+	public void getSubtreeWithPath_test() {
+		BinarySearchTreeImpl<Integer> subtree = ejemplo.getSubtreeWithPath("00");
+		assertEquals(Integer.valueOf(2), subtree.getContent());
+		BinarySearchTreeImpl<Integer> subtree2 = ejemplo.getSubtreeWithPath("10");
+		assertEquals(Integer.valueOf(15), subtree2.getContent());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void getSubtreeWithPath_exception_test() {
+		ejemplo.getSubtreeWithPath(null);
+		ejemplo.getSubtreeWithPath("02");
+	}
+
+	@Test(expected = NoSuchElementException.class)
+	public void getSubtreeWithPath_Nosuch_test() {
+		ejemplo.getSubtreeWithPath("000");
+		ejemplo.getSubtreeWithPath("001");
+	}
+
+	@Test
+	public void getContentWithPath_test() {
+		assertEquals(Integer.valueOf(2), ejemplo.getContentWithPath("00"));
+		assertEquals(Integer.valueOf(15), ejemplo.getContentWithPath("10"));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void getContentWithPath_exception_test() {
+		ejemplo.getContentWithPath(null);
+		ejemplo.getContentWithPath("02");
+	}
+
+	@Test(expected = NoSuchElementException.class)
+	public void getContentWithPath_Nosuch_test() {
+		ejemplo.getContentWithPath("000");
+		ejemplo.getContentWithPath("001");
+	}
+
+}
 
 
