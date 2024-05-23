@@ -120,6 +120,31 @@ public class BinarySearchTreeTests {
 	}
 
 	@Test
+	public void iteratorWidth_test() {
+		Assert.assertTrue(ejemplo.iteratorWidth().hasNext());
+		assertEquals(Integer.valueOf(10), ejemplo.iteratorWidth().next());
+	}
+
+	@Test
+	public void iteratorWidth_false_test() {
+		BinarySearchTreeImpl<Integer> tree = new BinarySearchTreeImpl<>();
+		Assert.assertFalse(tree.iteratorWidth().hasNext());
+	}
+
+	@Test
+	public void iteratorWidthInstances_test() {
+		ejemplo.insert(10);
+		Assert.assertTrue(ejemplo.iteratorWidthInstances().hasNext());
+		Assert.assertEquals(Integer.valueOf(10), ejemplo.iteratorWidthInstances().next());
+	}
+
+	@Test
+	public void iteratorWidthInstances_false_test() {
+		BinarySearchTreeImpl<Integer> tree = new BinarySearchTreeImpl<>();
+		Assert.assertFalse(tree.iteratorWidthInstances().hasNext());
+	}
+
+	@Test
 	public void remove_T_test() {
 		ejemplo.remove(15);
 		Assert.assertEquals("{10, {5, {2, ∅, ∅}, ∅}, {20, ∅, {30, ∅, ∅}}}", ejemplo.toString());
@@ -198,10 +223,8 @@ public class BinarySearchTreeTests {
 
 	@Test
 	public void getSubtreeWithPath_test() {
-		BinarySearchTreeImpl<Integer> subtree = ejemplo.getSubtreeWithPath("00");
-		assertEquals(Integer.valueOf(2), subtree.getContent());
-		BinarySearchTreeImpl<Integer> subtree2 = ejemplo.getSubtreeWithPath("10");
-		assertEquals(Integer.valueOf(15), subtree2.getContent());
+		Assert.assertEquals("{2, ∅, ∅}",ejemplo.getSubtreeWithPath("00").toString());
+		assertEquals("{15, ∅, ∅}", ejemplo.getSubtreeWithPath("10").toString());
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -232,6 +255,59 @@ public class BinarySearchTreeTests {
 	public void getContentWithPath_Nosuch_test() {
 		ejemplo.getContentWithPath("000");
 		ejemplo.getContentWithPath("001");
+	}
+
+	@Test
+	public void tagDescendent_test() {
+		ejemplo.tagDescendent();
+		Assert.assertEquals("{10 [(descend, 4)], {5 [(descend, 5)], {2 [(descend, 6)], ∅, ∅}, ∅}, {20 [(descend, 2)], {15 [(descend, 3)], ∅, ∅}, {30 [(descend, 1)], ∅, ∅}}}", ejemplo.toString());
+	}
+
+	@Test
+	public void parentChildPairsTagPreorder_test() {
+		Assert.assertEquals("[(10,5), (5,2), (10,20), (20,15), (20,30)]", ejemplo.parentChildPairsTagPreorder().toString());
+		Assert.assertEquals("{10 [(preorder, 1)], {5 [(preorder, 2)], {2 [(preorder, 3)], ∅, ∅}, ∅}, {20 [(preorder, 4)], {15 [(preorder, 5)], ∅, ∅}, {30 [(preorder, 6)], ∅, ∅}}}", ejemplo.toString());
+	}
+
+	@Test
+	public void tagLeftChildrenPostorder_test() {
+		Assert.assertEquals(3, ejemplo.tagLeftChildrenPostorder());
+		Assert.assertEquals("{10, {5 [(postorder, 2)], {2 [(postorder, 1)], ∅, ∅}, ∅}, {20, {15 [(postorder, 3)], ∅, ∅}, {30, ∅, ∅}}}", ejemplo.toString());
+	}
+
+	@Test
+	public void hasBrotherSameCount_test() {
+		Assert.assertFalse(ejemplo.hasBrotherSameCount());
+		Assert.assertFalse(ejemplo.getSubtreeWithPath("00").hasBrotherSameCount());
+		Assert.assertTrue(ejemplo.getSubtreeWithPath("10").hasBrotherSameCount());
+	}
+
+	@Test
+	public void toStringSimetric_test() {
+		Assert.assertEquals("", ejemplo.toStringSimetric());
+		Assert.assertEquals("{30, ∅, ∅}", ejemplo.getSubtreeWithPath("10").toStringSimetric());
+	}
+
+	@Test
+	public void getRoadUpRight_test() {
+		Assert.assertEquals(Integer.valueOf(20), ejemplo.getRoadUpRight(2, 2, 1));
+		Assert.assertEquals("{10 [(road, 3)], {5 [(road, 2)], {2 [(road, 1)], ∅, ∅}, ∅}, {20, {15, ∅, ∅}, {30, ∅, ∅}}}", ejemplo.toString());
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void getRoadUpRight_exception_test() {
+		ejemplo.getRoadUpRight(null, 0, 0);
+	}
+
+	@Test(expected = NoSuchElementException.class)
+	public void getRoadUpRight_NoSuch_test() {
+		ejemplo.getRoadUpRight(35, 3, 5);
+	}
+
+	@Test
+	public void tagOnlySonPreorder_test() {
+		Assert.assertEquals(3, ejemplo.tagOnlySonPreorder());
+		Assert.assertEquals("{10, {5 [(postorder, 2)], {2 [(postorder, 1)], ∅, ∅}, ∅}, {20, {15 [(postorder, 3)], ∅, ∅}, {30, ∅, ∅}}}", ejemplo.toString());
 	}
 
 }

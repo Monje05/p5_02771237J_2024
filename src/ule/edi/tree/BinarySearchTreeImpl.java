@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Queue;
 
 
 /**
@@ -290,10 +291,22 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * @return iterador para el recorrido en anchura
 	 */
     public Iterator<T> iteratorWidth() {
-	 	// TODO Implementar metodo
-		// puede implementarse creando una lista con el recorrido en anchura de los
-		// elementos del arbol y devolver el iterador de dicha lista
-		return null;
+	 	List<T> elements = new LinkedList<>();
+		if (!isEmpty()) {
+			Queue<BinarySearchTreeImpl<T>> queue = new LinkedList<>();
+			queue.add(this);
+			while (!queue.isEmpty()) {
+				BinarySearchTreeImpl<T> current = queue.poll();
+				elements.add(current.getContent());
+				if (current.getLeftBST() != null) {
+					queue.add(current.getLeftBST());
+				}
+				if (current.getRightBST() != null) {
+					queue.add(current.getRightBST());
+				}
+			}
+		}
+		return elements.iterator();
 	}
 
 	/**
@@ -309,11 +322,24 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * @return iterador para el recorrido en anchura
 	 */
      public Iterator<T> iteratorWidthInstances() {
-		// TODO Implementar metodo
-		// puede implementarse creando una lista con el recorrido en anchura de los
-		// elementos del arbol (teniendo el número de instancias que tiene el elemento)
-		//y devolver el iterador de dicha lista
-		return null;
+		List<T> elements = new LinkedList<>();
+		if (!isEmpty()) {
+			Queue<BinarySearchTreeImpl<T>> queue = new LinkedList<>();
+			queue.add(this);
+			while (!queue.isEmpty()) {
+				BinarySearchTreeImpl<T> current = queue.poll();
+				for (int i = 0; i < current.count; i++) {
+					elements.add(current.getContent());
+				}
+				if (current.getLeftBST() != null) {
+					queue.add(current.getLeftBST());
+				}
+				if (current.getRightBST() != null) {
+					queue.add(current.getRightBST());
+				}
+			}
+		}
+		return elements.iterator();
 	 }
 	
 		
@@ -637,8 +663,16 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	* 
    */
 	public void tagDescendent() {
-		// TODO
-		
+		tagDescendentAux(this, new int []{1});
+	}
+
+	private void tagDescendentAux(BinarySearchTreeImpl<T> node, int[] counter) {
+		if(node != null && !node.isEmpty()) {
+			tagDescendentAux(node.getRightBST(), counter);
+			node.setTag("descend", counter[0]);
+			counter[0]++;
+			tagDescendentAux(node.getLeftBST(), counter);
+		}
 	}
 
 
@@ -674,8 +708,21 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * @retur lista con el resultado.
 	 */
 	public List<String> parentChildPairsTagPreorder() {
-	//TODO
-		return null;
+		List<String> pairs = new LinkedList<>();
+		tagPreorder(this, new int[]{1}, pairs, null);
+		return pairs;
+	}
+
+	private void tagPreorder(BinarySearchTreeImpl<T> node, int[] counter, List<String> pairs, BinarySearchTreeImpl<T> parent) {
+		if(node != null && !node.isEmpty()) {
+			node.setTag("preorder", counter[0]);
+			if(parent != null) {
+				pairs.add("(" + parent.getContent() + "," + node.getContent() + ")");
+			}
+			counter[0]++;
+			tagPreorder(node.getLeftBST(), counter, pairs, node);
+        	tagPreorder(node.getRightBST(), counter, pairs, node);
+		}
 	}
 
 
@@ -711,8 +758,22 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * @return numero de nodos hijos izquierdos
 	 */
 	public int tagLeftChildrenPostorder() {
-		//TODO
-		return 0;
+		return tagLeftChildrenPostorderAux(this, new int[]{1});
+	}
+
+	private int tagLeftChildrenPostorderAux(BinarySearchTreeImpl<T> node, int[] counter) {
+		if(node == null || node.isEmpty()) {
+			return 0;
+		}
+
+		int leftCount = tagLeftChildrenPostorderAux(node.getLeftBST(), counter);
+		int rightCount = tagLeftChildrenPostorderAux(node.getRightBST(), counter);
+		if(node.father != null && node == node.father.getLeftBST()) {
+			node.setTag("postorder", counter[0]);
+			counter[0]++;
+			return leftCount + rightCount + 1;
+		}
+		return leftCount + rightCount;
 	}
 
 
@@ -734,8 +795,40 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	*    no tiene el mismo nº de instancias)
 	*/
 	public boolean hasBrotherSameCount() {
-		//TODO
-		return false;
+		BinarySearchTreeImpl<T> parent = getParent(father);
+		if(parent == null) {
+			return false;
+		}
+
+		BinarySearchTreeImpl<T> brother = null;
+		if(parent.getLeftBST() != null && parent.getLeftBST() != this) {
+			brother = parent.getLeftBST();
+		} else if(parent.getRightBST() != null && parent.getRightBST() != this) {
+			brother = parent.getRightBST();
+		}
+
+		if(brother == null) {
+			return false;
+		}
+
+		return this.instancesCount() == brother.instancesCount();
+	}
+
+	private BinarySearchTreeImpl<T> getParent(BinarySearchTreeImpl<T> root) {
+		if(root == null || root.isEmpty() || root == this) {
+			return null;
+		}
+
+		if(root.getLeftBST() == this || root.getRightBST() == this) {
+			return root;
+		}
+
+		BinarySearchTreeImpl<T> parent = getParent(root.getLeftBST());
+		if(parent != null) {
+			return parent;
+		}
+
+		return getParent(root.getRightBST());
 	}
 	
 	/**
@@ -757,7 +850,23 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	*    
 	*/
 	public String toStringSimetric() {
-		//TODO
+		BinarySearchTreeImpl<T> symetric = findSymmetricalNode();
+		if(symetric != null) {
+			return symetric.toString();
+		} else {
+			return "";
+		}
+	}
+
+	private BinarySearchTreeImpl<T> findSymmetricalNode() {
+		BinarySearchTreeImpl<T> parent = getParent(father);
+		if(parent != null) {
+			if(parent.getLeftBST() == this && parent.getRightBST() != null) {
+				return parent.getRightBST();
+			} else if(parent.getRightBST() == this && parent.getLeftBST() != null) {
+				return parent.getLeftBST();
+			}
+		}
 		return null;
 	}
 	
@@ -781,9 +890,65 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * @throws IllegalArgumentException si element es null
 	 */
 	public T getRoadUpRight(T elem, int up, int right) {
-		//TODO
-	return null;
-	}	
+		if (elem == null) {
+			throw new IllegalArgumentException("El elemento no puede ser nulo");
+		}
+		
+		BinarySearchTreeImpl<T> node = getNode(elem);
+		
+		if (node == null) {
+			throw new NoSuchElementException("El elemento no está en el árbol");
+		}
+		
+		BinarySearchTreeImpl<T> current = node;
+		int count = 1; 
+		while (current != null) {
+			current.setTag("road", count);
+			count++;
+			current = current.father;
+		}
+
+		for (int i = 0; i < up; i++) {
+			if (node.father != null) {
+				node = node.father;
+			} else {
+				break; 
+			}
+		}
+		
+		for (int i = 0; i < right; i++) {
+			if (node.right != null) {
+				node = node.getRightBST();
+			} else {
+				break; 
+			}
+		}
+		
+		return node.getContent(); 
+	}
+
+	private BinarySearchTreeImpl<T> getNode(T elem) {
+        if (this.getContent().equals(elem)) {
+            return this;
+        }
+
+        BinarySearchTreeImpl<T> leftNode = null;
+        if (getLeftBST() != null) {
+            leftNode = getLeftBST().getNode(elem);
+        }
+
+        if (leftNode != null) {
+            return leftNode;
+        }
+
+        BinarySearchTreeImpl<T> rightNode = null;
+        if (getRightBST() != null) {
+            rightNode = getRightBST().getNode(elem);
+        }
+
+        return rightNode;
+    }
+
 	
 	/**
 	 * Importante: Solamente se puede recorrer el arbol una vez
@@ -809,9 +974,29 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * 
 	 */
 	public int tagOnlySonPreorder() {
-    //TODO
-	return 0;
+		int a = tagLeftChildrenPostorderAux(this, new int[]{1});
+		return a;
 	}
+
+	private int tagOnlySonPreorderAux(BinarySearchTreeImpl<T> node, int[] counter) {
+		if(node == null) {
+			return 0;
+		}
+
+		int count = 0;
+
+		if(node.father != null && (node.father.getLeftBST() == null || node.father.getRightBST() == null)) {
+			node.setTag("onlySon", counter[0]++);
+			count++;
+		} else {
+			counter[0]++;
+		}
+
+		count += tagOnlySonPreorderAux(node.getLeftBST(), counter);
+		count += tagOnlySonPreorderAux(node.getRightBST(), counter);
+
+		return count;
+	} 
 		
 }
 	
