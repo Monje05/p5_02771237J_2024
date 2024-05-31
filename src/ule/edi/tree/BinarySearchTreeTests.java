@@ -197,6 +197,10 @@ public class BinarySearchTreeTests {
 		ejemplo.removeAll(20);
 		Assert.assertEquals("{10, {5, {2, ∅, ∅}, ∅}, {30, {15, ∅, ∅}, ∅}}",ejemplo.toString());
 	}	
+	@Test(expected = NoSuchElementException.class)
+	public void removeAll_Exception_test() {
+		ejemplo.removeAll(18);
+	}
 				
 	@Test(expected = IllegalArgumentException.class)
 	public void testInsertException() {
@@ -306,8 +310,8 @@ public class BinarySearchTreeTests {
 
 	@Test
 	public void tagOnlySonPreorder_test() {
-		Assert.assertEquals(3, ejemplo.tagOnlySonPreorder());
-		Assert.assertEquals("{10, {5 [(postorder, 2)], {2 [(postorder, 1)], ∅, ∅}, ∅}, {20, {15 [(postorder, 3)], ∅, ∅}, {30, ∅, ∅}}}", ejemplo.toString());
+		Assert.assertEquals(0, ejemplo.tagOnlySonPreorder());
+		Assert.assertEquals("{10, {5, {2 [(onlySon, 3)], ∅, ∅}, ∅}, {20, {15, ∅, ∅}, {30, ∅, ∅}}}", ejemplo.toString());
 	}
 
 }

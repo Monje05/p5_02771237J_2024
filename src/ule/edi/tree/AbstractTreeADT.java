@@ -84,6 +84,7 @@ public abstract class AbstractTreeADT<T> implements TreeADT<T> {
 
 	@Override
 	public boolean isLeaf() {
+		
 		if (isEmpty()) {
 			return false;
 		}
@@ -92,8 +93,8 @@ public abstract class AbstractTreeADT<T> implements TreeADT<T> {
 		//	hoja si todos sus sub-árboles son vacíos.
 		for (int i = 0; i < getMaxDegree(); i++) {
 			//	Al menos uno no es vacío, entonces éste no es hoja
-			if(this.getSubtree(i) != null && !this.getSubtree(i).isEmpty()){
-				return false;
+			if (this.getSubtree(i) != null && !getSubtree(i).isEmpty()) { 
+				return false; 
 			}
 		}
 		//	Todos son vacíos, éste es hoja

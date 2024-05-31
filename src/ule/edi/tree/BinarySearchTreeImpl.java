@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
+import javax.swing.text.AbstractDocument.Content;
+
 
 /**
  * arbol binario de busqueda (binary search tree, BST).
@@ -181,6 +183,8 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 		if(content == null) {
 			this.content = element;
 			this.count = 1;
+			setRightBST(new BinarySearchTreeImpl<>(this));
+			setLeftBST(new BinarySearchTreeImpl<>(this));
 			return true;
 		}
 		int comparison = element.compareTo(this.content);
@@ -402,6 +406,7 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * 
 	 * return numero de elementos eliminados del arbol
 	 */
+	@SuppressWarnings("unchecked")
 	public int  remove(T... elements) {
 		int removed = 0;
 		for(T element : elements) {
@@ -424,16 +429,89 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
      *
 	 */
 	public void remove(T element) {
-		remove(element, 1);
+		if(element == null) {
+			throw new IllegalArgumentException();
+		}
+		if(!contains(element)) {
+			throw new NoSuchElementException();
+		}
+		if(isEmpty()) {
+			throw new NoSuchElementException();
+		}
+		removeRec(element);
+
 	}
 
-	private BinarySearchTreeImpl<T> minValueNode() {
-		BinarySearchTreeImpl<T> current = this;
-		while(current.left != null) {
-			current = current.getLeftBST();
+	private void removeRec(T element) {
+		if(!isEmpty()) {
+			if (content.compareTo(element) == 0) {
+				if (count > 1) {
+					count--;
+				} else {
+					if (isLeaf()) {
+						this.content = null;
+						this.count = 0;
+						this.right = null;
+						this.left = null;
+					} else if (getRightBST().isEmpty()) {
+						copySubtree(getLeftBST());
+					} else if (getLeftBST().isEmpty()) {
+						copySubtree(getRightBST());
+					} else {
+						BinarySearchTreeImpl<T> aux = getRightBST().mM();
+						this.content = aux.content;
+						this.count = aux.count;
+						getRightBST().removeAll(aux.content);
+						if (this.getRightBST() != null && !this.getRightBST().isEmpty()) {
+							this.getRightBST().father = this;
+						}
+						if (this.getLeftBST() != null && !this.getLeftBST().isEmpty()) {
+							this.getLeftBST().father = this;
+						}
+					}
+				}
+			} else if (content.compareTo(element) > 0) {
+				if (getLeftBST() != null && !getLeftBST().isEmpty()) {
+					getLeftBST().removeRec(element);
+				}
+			} else {
+				if (getRightBST() != null && !getRightBST().isEmpty()) {
+					getRightBST().removeRec(element);
+				}
+			}
 		}
-		return current;
 	}
+
+	private BinarySearchTreeImpl<T> mM() {
+		if (getLeftBST().isEmpty()) {
+			return this;
+		} else {
+			return getLeftBST().mM();
+		}
+	}
+
+	private void copySubtree(BinarySearchTreeImpl<T> subtree) {
+		if (subtree == null) {
+			this.content = null;
+			this.count = 0;
+			this.left = null;
+			this.right = null;
+		} else {
+			this.content = subtree.content;
+			this.count = subtree.count;
+			this.left = subtree.left;
+			this.right = subtree.right;
+		}
+	
+		if (getLeftBST()!=null && !getLeftBST().isEmpty()) {
+			getLeftBST().father = this;
+		}
+		if (getRightBST()!=null && !getRightBST().isEmpty()) {
+			getRightBST().father = this;
+		}
+	}
+
+
 	
 	/**
 	 * Decrementa el número de instancias del elemento en num unidades.
@@ -450,63 +528,38 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * 
 	 */
 	public int remove(T element, int num) {
-		if(element == null) {
+		if (element == null) {
 			throw new IllegalArgumentException();
 		}
-
-		if(this.isEmpty()) {
+		if (!contains(element)) {
+			throw new NoSuchElementException();
+		}
+		if(isEmpty()) {
 			throw new NoSuchElementException();
 		}
 
-		if(element.compareTo(getContent()) < 0) {
-			if(getLeftBST() == null) {
-				throw new NoSuchElementException();
-			}
-			return getLeftBST().remove(element, num);
-		}
-
-		if(element.compareTo(getContent()) > 0) {
-			if(getRightBST() == null) {
-				throw new NoSuchElementException();
-			}
-			return getRightBST().remove(element, num);
-		}
-
-		if(this.count > 1) {
-			this.count--;
-			return num;
-		}
-
-		if(this.isLeaf()) {
-			this.setContent(null);
-			this.count = 0;
-			this.setLeftBST(null);
-			this.setRightBST(null);
-			return num;
-		}
-
-		if(getRightBST() == null) {
-			this.setContent(this.getLeftBST().getContent());
-			this.count = getLeftBST().count;
-			this.setLeftBST(getLeftBST().getLeftBST());
-			this.setRightBST(getLeftBST().getRightBST());
-			return num;
-		}
-
-		if(getLeftBST() == null) {
-			this.setContent(this.getRightBST().getContent());
-			this.count = getRightBST().count;
-			this.setLeftBST(getRightBST().getLeftBST());
-			this.setRightBST(getRightBST().getRightBST());
-			return num;
-		}
-
-		BinarySearchTreeImpl<T> succesor = getRightBST().minValueNode();
-		this.count = succesor.count;
-		this.setContent(succesor.getContent());
-		return getRightBST().remove(succesor.getContent(), succesor.count);
+		return removeRec(element, num);
 	}
 
+	private int removeRec(T element, int num) {
+		if (isEmpty()) {
+			return 0;
+		}
+		int deleted = 0;
+		if (content.compareTo(element) > 0) {
+			deleted = getLeftBST().removeRec(element, num);
+		} else if (content.compareTo(element) < 0) {
+			deleted = getRightBST().removeRec(element, num);
+		} else {
+			num = Math.min(count, num);
+			count -= num;
+			deleted = num;
+			if(count==0){
+				remove(element);
+			}
+		}
+		return deleted;
+	}
 	
 	/**
 	 * Elimina todas las instancias del elemento en el árbol 
@@ -521,22 +574,26 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 */
 	public int removeAll(T element) {
 		if (element == null) {
-			throw new IllegalArgumentException("Element cannot be null");
+			throw new IllegalArgumentException();
 		}
-	
-		int totalRemoved = 0;
-		
-		try {
-			while (true) {
-				totalRemoved += remove(element, 1);
-			}
-		} catch (NoSuchElementException e) {
-
+		if (!contains(element)) {
+			throw new NoSuchElementException();
+		}
+		if(isEmpty()) {
+			throw new NoSuchElementException();
 		}
 		
-		return totalRemoved;
+		int deleted = 0;
+		if (content.compareTo(element) > 0) {
+			deleted =  deleted + getLeftBST().removeAll(element);
+		} else if (content.compareTo(element) < 0) {
+			deleted =  deleted + getRightBST().removeAll(element);
+		} else {
+			deleted = count;
+			remove(element, count);
+		}
+		return deleted;
 	}
-
 
 	/**
 	* Devuelve el sub-árbol indicado. (para tests)
@@ -850,24 +907,25 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	*    
 	*/
 	public String toStringSimetric() {
-		BinarySearchTreeImpl<T> symetric = findSymmetricalNode();
-		if(symetric != null) {
-			return symetric.toString();
-		} else {
+		if(father ==null){
 			return "";
 		}
+		return toStringS("");
 	}
-
-	private BinarySearchTreeImpl<T> findSymmetricalNode() {
-		BinarySearchTreeImpl<T> parent = getParent(father);
-		if(parent != null) {
-			if(parent.getLeftBST() == this && parent.getRightBST() != null) {
-				return parent.getRightBST();
-			} else if(parent.getRightBST() == this && parent.getLeftBST() != null) {
-				return parent.getLeftBST();
+	private String toStringS(String ruta){
+		if(father == null){
+			try{
+				return getSubtreeWithPath(ruta).toString();
+			}catch(Exception e){
+				return "";
 			}
 		}
-		return null;
+		if(father.content.compareTo(content) > 0){
+			return father.toStringS("1" + ruta);
+		}else{
+			return father.toStringS("0" + ruta);
+		}
+		
 	}
 	
 	/**
@@ -891,63 +949,41 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 */
 	public T getRoadUpRight(T elem, int up, int right) {
 		if (elem == null) {
-			throw new IllegalArgumentException("El elemento no puede ser nulo");
+			throw new IllegalArgumentException();
 		}
-		
-		BinarySearchTreeImpl<T> node = getNode(elem);
-		
-		if (node == null) {
-			throw new NoSuchElementException("El elemento no está en el árbol");
+		if(isEmpty()) {
+			throw new NoSuchElementException();
 		}
-		
-		BinarySearchTreeImpl<T> current = node;
-		int count = 1; 
-		while (current != null) {
-			current.setTag("road", count);
-			count++;
-			current = current.father;
+		if(content.compareTo(elem) > 0) {
+			return getLeftBST().getRoadUpRight(elem, up, right);
+		}
+		if(content.compareTo(elem) < 0) {
+			return getRightBST().getRoadUpRight(elem, up, right);
+		}
+		BinarySearchTreeImpl<T> aux = this;
+		int pos = 1;
+		while(up > 0) {
+			if(aux.father == null) {
+				throw new NoSuchElementException();
+			}
+			aux.setTag("road", pos++);
+			aux = aux.father;
+			up--;
 		}
 
-		for (int i = 0; i < up; i++) {
-			if (node.father != null) {
-				node = node.father;
-			} else {
-				break; 
+		while(right > 0) {
+			if(aux.isEmpty()) {
+				throw new NoSuchElementException();
 			}
+			aux.setTag("road", pos++);
+			aux = aux.getRightBST();
+			right--;
 		}
-		
-		for (int i = 0; i < right; i++) {
-			if (node.right != null) {
-				node = node.getRightBST();
-			} else {
-				break; 
-			}
+		if(aux.isEmpty()) {
+			aux.setTag("road", pos++);
 		}
-		
-		return node.getContent(); 
+		return aux.content; 
 	}
-
-	private BinarySearchTreeImpl<T> getNode(T elem) {
-        if (this.getContent().equals(elem)) {
-            return this;
-        }
-
-        BinarySearchTreeImpl<T> leftNode = null;
-        if (getLeftBST() != null) {
-            leftNode = getLeftBST().getNode(elem);
-        }
-
-        if (leftNode != null) {
-            return leftNode;
-        }
-
-        BinarySearchTreeImpl<T> rightNode = null;
-        if (getRightBST() != null) {
-            rightNode = getRightBST().getNode(elem);
-        }
-
-        return rightNode;
-    }
 
 	
 	/**
@@ -974,7 +1010,7 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 * 
 	 */
 	public int tagOnlySonPreorder() {
-		int a = tagLeftChildrenPostorderAux(this, new int[]{1});
+		int a = tagOnlySonPreorderAux(this, new int[]{1});
 		return a;
 	}
 
