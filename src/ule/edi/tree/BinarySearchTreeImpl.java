@@ -1,5 +1,3 @@
-package ule.edi.tree;
-
 
 import java.util.Collection;
 import java.util.Collections;
@@ -8,8 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
-
-import javax.swing.text.AbstractDocument.Content;
 
 
 /**
@@ -949,7 +945,7 @@ public class BinarySearchTreeImpl<T extends Comparable<? super T>> extends Abstr
 	 */
 	public T getRoadUpRight(T elem, int up, int right) {
 		if (elem == null) {
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException("El elemento no puede ser nulo");
 		}
 		if(isEmpty()) {
 			throw new NoSuchElementException();
